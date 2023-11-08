@@ -22,6 +22,18 @@ func TestParse(t *testing.T) {
 			t.Errorf("want: %v\ngot: %v", want, res.Metadata)
 		}
 	})
+
+	// t.Run("Cookware", func(t *testing.T) {
+	// 	want := []Cookware{
+	// 		{
+	// 			Name:     "blender",
+	// 			Quantity: "",
+	// 		},
+	// 	}
+	// 	if !reflect.DeepEqual(res.Cookware, want) {
+	// 		t.Errorf("want: %v\ngot: %v", want, res.Metadata)
+	// 	}
+	// })
 }
 
 func TestParseMetadata(t *testing.T) {
@@ -43,5 +55,98 @@ func TestParseMetadata(t *testing.T) {
 		if !reflect.DeepEqual(want, got) {
 			t.Errorf("want: %v\ngot: %v", want, got)
 		}
+	})
+}
+
+func TestParseCookware(t *testing.T) {
+	t.Run("NoCookware", func(t *testing.T) {
+		got := parseCookware("Taste and adjust if desired.")
+
+		if len(got) > 0 {
+			t.Errorf("want: []\ngot: %v", got)
+		}
+	})
+
+	t.Run("HasCookware", func(t *testing.T) {
+		t.Run("CookwareAtEndNoPeriod", func(t *testing.T) {
+			got := parseCookware("Place in #blender")
+			want := []Cookware{
+				{
+					Name: "blender",
+				},
+			}
+
+			if !reflect.DeepEqual(want, got) {
+				t.Errorf("want: %v\ngot: %v", want, got)
+			}
+		})
+
+		t.Run("CookwareAtEndWithPeriod", func(t *testing.T) {
+			got := parseCookware("Place in #blender.")
+			want := []Cookware{
+				{
+					Name: "blender",
+				},
+			}
+
+			if !reflect.DeepEqual(want, got) {
+				t.Errorf("want: %v\ngot: %v", want, got)
+			}
+		})
+
+		t.Run("CookwareMidSentence", func(t *testing.T) {
+			got := parseCookware("Place in #blender on high speed")
+			want := []Cookware{
+				{
+					Name: "blender",
+				},
+			}
+
+			if !reflect.DeepEqual(want, got) {
+				t.Errorf("want: %v\ngot: %v", want, got)
+			}
+		})
+
+		t.Run("CookwareWithEmptyQuantity", func(t *testing.T) {
+			got := parseCookware("Place in #blender{} on high speed")
+			want := []Cookware{
+				{
+					Name: "blender",
+				},
+			}
+
+			if !reflect.DeepEqual(want, got) {
+				t.Errorf("want: %v\ngot: %v", want, got)
+			}
+		})
+
+		t.Run("CookwareWithMultiWordName", func(t *testing.T) {
+			got := parseCookware("Place in #potato ricer{}")
+			want := []Cookware{
+				{
+					Name: "potato ricer",
+				},
+			}
+
+			if !reflect.DeepEqual(want, got) {
+				t.Errorf("want: %v\ngot: %v", want, got)
+			}
+		})
+
+		t.Run("MultipleCookware", func(t *testing.T) {
+			got := parseCookware("Place in #potato ricer{} or #food processor{}")
+			want := []Cookware{
+				{
+					Name: "potato ricer",
+				},
+				{
+					Name: "food processor",
+				},
+			}
+
+			if !reflect.DeepEqual(want, got) {
+				t.Errorf("want: %v\ngot: %v", want, got)
+			}
+		})
 	})
 }
